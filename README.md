@@ -1,1 +1,2 @@
-# Minecraft-Launcher-VBS
+# Minecraft-Launcher на VBS скрипте
+(Внимание это экспериментальный проект!)
