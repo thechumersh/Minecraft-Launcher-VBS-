@@ -6,17 +6,17 @@ Dim logDirectory, sessionLogFile, logFileName, logNumber, currentDate, uiStyle
 Set shell = CreateObject("WScript.Shell")
 Set fso = CreateObject("Scripting.FileSystemObject")
 
-' Определяем пути
+' РћРїСЂРµРґРµР»СЏРµРј РїСѓС‚Рё
 appPath = fso.GetParentFolderName(WScript.ScriptFullName)
 settingsFile = appPath & "\settings.txt"
 logDirectory = appPath & "\logs"
 
-' Проверяем и создаём директорию для логов, если она не существует
+' РџСЂРѕРІРµСЂСЏРµРј Рё СЃРѕР·РґР°С‘Рј РґРёСЂРµРєС‚РѕСЂРёСЋ РґР»СЏ Р»РѕРіРѕРІ, РµСЃР»Рё РѕРЅР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 If Not fso.FolderExists(logDirectory) Then
     fso.CreateFolder(logDirectory)
 End If
 
-' Логирование событий
+' Р›РѕРіРёСЂРѕРІР°РЅРёРµ СЃРѕР±С‹С‚РёР№
 Sub LogEvent(eventMessage)
     Dim logFile, timestamp
     timestamp = Now
@@ -25,7 +25,7 @@ Sub LogEvent(eventMessage)
     logFile.Close
 End Sub
 
-' Создаём или определяем лог-файл
+' РЎРѕР·РґР°С‘Рј РёР»Рё РѕРїСЂРµРґРµР»СЏРµРј Р»РѕРі-С„Р°Р№Р»
 Sub InitializeLog
     currentDate = Year(Now) & "-" & Right("00" & Month(Now), 2) & "-" & Right("00" & Day(Now), 2)
     logFileName = logDirectory & "\" & currentDate & "-log.txt"
@@ -40,10 +40,10 @@ Sub InitializeLog
             fso.MoveFile sessionLogFile, logFileName
         End If
     End If
-    LogEvent "[INFO] Лаунчер запущен"
+    LogEvent "[MAIN/CLIENT]: Launcher started"
 End Sub
 
-' Загрузка настроек
+' Р—Р°РіСЂСѓР·РєР° РЅР°СЃС‚СЂРѕРµРє
 Sub LoadSettings
     If fso.FileExists(settingsFile) Then
         Dim settings, line, lines
@@ -65,7 +65,7 @@ Sub LoadSettings
                 uiStyle = Mid(line, 9)
             End If
         Next
-        LogEvent "[CLIENT] Настройки успешно загружены"
+        LogEvent "[MAIN/CLIENT]: Settings loaded successfully"
     Else
         nickname = "Player"
         ramAmount = "1024M"
@@ -74,11 +74,11 @@ Sub LoadSettings
         javaArgs = ""
         uiStyle = "Default"
         SaveSettings
-        LogEvent "[WARNING] Настройки не найдены. Созданы новые с умолчательными значениями"
+        LogEvent "[WARNING/CLIENT]: Settings not found. New ones created with default values"
     End If
 End Sub
 
-' Сохранение настроек
+' РЎРѕС…СЂР°РЅРµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє
 Sub SaveSettings
     Dim settings
     Set settings = fso.CreateTextFile(settingsFile, True)
@@ -91,7 +91,7 @@ Sub SaveSettings
     settings.Close
 End Sub
 
-' Применение стиля интерфейса
+' РџСЂРёРјРµРЅРµРЅРёРµ СЃС‚РёР»СЏ РёРЅС‚РµСЂС„РµР№СЃР°
 Function FormatText(title, content)
     Select Case uiStyle
         Case "Default"
@@ -101,7 +101,7 @@ Function FormatText(title, content)
         Case "Retro"
             FormatText = "+----------------+" & vbCrLf & "| " & title & " |" & vbCrLf & "+----------------+" & vbCrLf & content
         Case "Elegant"
-            FormatText = "¦¦ " & title & " ¦¦" & vbCrLf & content
+            FormatText = "В¦В¦ " & title & " В¦В¦" & vbCrLf & content
         Case "Cyber"
             FormatText = ">>> " & title & " <<<" & vbCrLf & content
         Case Else
@@ -109,28 +109,28 @@ Function FormatText(title, content)
     End Select
 End Function
 
-' Подтверждение выхода
+' РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ РІС‹С…РѕРґР°
 Function ConfirmExit
     Dim confirmResult
-    confirmResult = MsgBox("Вы действительно хотите выйти?", vbYesNo + vbQuestion, "Подтверждение выхода")
+    confirmResult = MsgBox("Are you sure you want to go out?", vbYesNo + vbQuestion, "Confirm exit")
     If confirmResult = vbYes Then
-        LogEvent "[INFO] Лаунчер закрыт" ' Записываем в лог перед выходом
+        LogEvent "[MAIN/CLIENT]: Launcher closed" ' Р—Р°РїРёСЃС‹РІР°РµРј РІ Р»РѕРі РїРµСЂРµРґ РІС‹С…РѕРґРѕРј
         ConfirmExit = True
     Else
         ConfirmExit = False
     End If
 End Function
 
-' Функция изменения стиля интерфейса
+' Р¤СѓРЅРєС†РёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃС‚РёР»СЏ РёРЅС‚РµСЂС„РµР№СЃР°
 Sub ChangeUIStyle
     Dim choice
-    choice = InputBox(FormatText("Выберите стиль интерфейса", _
+    choice = InputBox(FormatText("Choose an interface style", _
                                  "1. Default" & vbCrLf & _
                                  "2. Modern" & vbCrLf & _
                                  "3. Retro" & vbCrLf & _
                                  "4. Elegant" & vbCrLf & _
                                  "5. Cyber" & vbCrLf & _
-                                 "6. Назад"))
+                                 "6. РќР°Р·Р°Рґ"))
     Select Case choice
         Case "1"
             uiStyle = "Default"
@@ -145,51 +145,51 @@ Sub ChangeUIStyle
         Case "6"
             Exit Sub
         Case Else
-            MsgBox "Неверный выбор!", vbExclamation, "Ошибка"
+            MsgBox "The wrong choice!", vbExclamation, "Error"
     End Select
-    LogEvent "[CLIENT] Стиль интерфейса изменён на: " & uiStyle
+    LogEvent "[INFO/CLIENT]: Interface style changed to: " & uiStyle
 End Sub
 
-' Меню настроек
+' РњРµРЅСЋ РЅР°СЃС‚СЂРѕРµРє
 Sub SettingsMenu
     Dim choice, input
     Do
-        choice = InputBox(FormatText("Настройки", _ 
-                                     "1. Изменить ник (текущий: " & nickname & ")" & vbCrLf & _
-                                     "2. Изменить ОЗУ (текущее: " & ramAmount & ")" & vbCrLf & _
-                                     "3. Изменить путь для работы игры" & vbCrLf & _
-                                     "4. Изменить Java аргументы (текущие: " & javaArgs & ")" & vbCrLf & _
-                                     "5. Изменить стиль интерфейса (текущий: " & uiStyle & ")" & vbCrLf & _
-                                     "6. Назад"))
+        choice = InputBox(FormatText("Settings", _ 
+                                     "1. Change Nick (current: " & nickname & ")" & vbCrLf & _
+                                     "2. Change RAM (current: " & ramAmount & ")" & vbCrLf & _
+                                     "3. Change the path for running the game" & vbCrLf & _
+                                     "4. Change Java arguments (current: " & javaArgs & ")" & vbCrLf & _
+                                     "5. Change UI style (current: " & uiStyle & ")" & vbCrLf & _
+                                     "6. Back"))
         If choice = "" Then Exit Do
         Select Case choice
             Case "1"
-                input = InputBox("Введите новый ник:", "Изменение ника", nickname)
+                input = InputBox("Enter a new nickname:", "Change nickname", nickname)
                 If input = "" Then
-                    MsgBox "В поле нечего не было введено, изменение ника отменено.", vbExclamation, "Отмена"
-                    LogEvent "[WARNING] Изменение ника отменено, поле было пустым."
+                    MsgBox "Nothing was entered in the field, nickname change was canceled.", vbExclamation, "Cancel"
+                    LogEvent "[WARNING/CLIENT]: Nickname change cancelled, field was empty."
                 Else
-                    LogEvent "[CLIENT] Изменён ник с '" & nickname & "' на '" & input & "'"
+                    LogEvent "[INFO/CLIENT]: Change Nick from '" & nickname & "' to '" & input & "'"
                     nickname = input
                 End If
             Case "2"
-                input = InputBox("Введите новое значение ОЗУ (например, 1024M):", "Изменение ОЗУ", ramAmount)
+                input = InputBox("Enter a new RAM value (example, 1024M):", "Changing RAM", ramAmount)
                 If input = "" Then
-                    MsgBox "В поле нечего не было введено, изменение ОЗУ отменено.", vbExclamation, "Отмена"
-                    LogEvent "[WARNING] Изменение ОЗУ отменено, поле было пустым."
+                    MsgBox "Nothing was entered in the field, RAM change was cancelled.", vbExclamation, "Cancel"
+                    LogEvent "[WARNING/CLIENT]: RAM change cancelled, field was empty."
                 Else
-                    LogEvent "[CLIENT] Изменена ОЗУ с '" & ramAmount & "' на '" & input & "'"
+                    LogEvent "[INFO/CLIENT]: Changed ram from '" & ramAmount & "' to '" & input & "'"
                     ramAmount = input
                 End If
             Case "3"
                 ChangePaths
             Case "4"
-                input = InputBox("Введите новые Java аргументы:", "Изменение Java аргументов", javaArgs)
+                input = InputBox("Enter new Java arguments:", "Changing Java Arguments", javaArgs)
                 If input = "" Then
-                    MsgBox "В поле нечего не было введено, изменение Java аргументов отменено.", vbExclamation, "Отмена"
-                    LogEvent "[WARNING] Изменение Java аргументов отменено, поле было пустым."
+                    MsgBox "Nothing was entered in the field, Java arguments change was cancelled.", vbExclamation, "Cancel"
+                    LogEvent "[WARNING/CLIENT]: Java arguments change cancelled, field was empty."
                 Else
-                    LogEvent "[CLIENT] Изменены Java аргументы с '" & javaArgs & "' на '" & input & "'"
+                    LogEvent "[INFO/CLIENT]: Changed Java arguments from '" & javaArgs & "' to '" & input & "'"
                     javaArgs = input
                 End If
             Case "5"
@@ -197,76 +197,76 @@ Sub SettingsMenu
             Case "6"
                 Exit Do
             Case Else
-                MsgBox "Неверный выбор!", vbExclamation, "Ошибка"
+                MsgBox "Wrong choice!", vbExclamation, "Error"
         End Select
         SaveSettings
     Loop
 End Sub
 
-' Изменение путей
+' РР·РјРµРЅРµРЅРёРµ РїСѓС‚РµР№
 Sub ChangePaths
     Dim input
-    input = InputBox("Введите новый путь к Minecraft:", "Изменение пути Minecraft", minecraftPath)
+    input = InputBox("Enter the new path to Minecraft:", "Changing Minecraft Path", minecraftPath)
     If input = "" Then
-        MsgBox "В поле нечего не было введено, изменение пути Minecraft отменено.", vbExclamation, "Отмена"
-        LogEvent "Изменение пути Minecraft отменено, поле было пустым."
+        MsgBox "Nothing was entered in the field, the change to the Minecraft path was canceled.", vbExclamation, "Cancel"
+        LogEvent "[ERROR/CLIENT]: Minecraft path change reverted, field was empty."
     ElseIf Not fso.FileExists(input & "\minecraft.jar") Then
-        MsgBox "[WARNING] Файл minecraft.jar не найден по указанному пути.", vbCritical, "Ошибка"
-        LogEvent "[ERROR] Ошибка: minecraft.jar не найден"
+        MsgBox "The file minecraft.jar was not found at the specified path.", vbCritical, "Error"
+        LogEvent "[ERROR/CLIENT]: Error: minecraft.jar not found"
     Else
-        LogEvent "[CLIENT] Изменён путь к Minecraft с '" & minecraftPath & "' на '" & input & "'"
+        LogEvent "[INFO/CLIENT]: Changed path to Minecraft from '" & minecraftPath & "' to '" & input & "'"
         minecraftPath = input
     End If
 End Sub
 
-' Запуск игры
+' Р—Р°РїСѓСЃРє РёРіСЂС‹
 Sub LaunchGame
     If minecraftPath = "" Or javaPath = "" Then
-        MsgBox "Пути к Minecraft или Java не указаны. Проверьте настройки.", vbCritical, "Ошибка запуска"
-		LogEvent "[ERROR] Ошибка: Путь не найдет Minecraft или Java"
+        MsgBox "Paths to Minecraft or Java are not specified. Check your settings.", vbCritical, "Launch error"
+		LogEvent "[ERROR/CLIENT]: Error: Path will not find Minecraft or Java"
         Exit Sub
     End If
     
     Dim commandLine, launcherHwnd, exitCode
 
-    ' Формируем команду для запуска Minecraft
+    ' Р¤РѕСЂРјРёСЂСѓРµРј РєРѕРјР°РЅРґСѓ РґР»СЏ Р·Р°РїСѓСЃРєР° Minecraft
     commandLine = """" & javaPath & """ -Xmx" & ramAmount & " -Djava.library.path=natives -cp """ & _
                   "minecraft.jar;jinput.jar;lwjgl.jar;lwjgl_util.jar""" & _
                   " net.minecraft.client.Minecraft " & nickname & " " & javaArgs
-    LogEvent "[CLIENT] Запуск игры с командой: " & commandLine
+    LogEvent "[INFO/CLIENT]: Launching the game with the team: " & commandLine
 
-    ' Получаем идентификатор окна лаунчера
+    ' РџРѕР»СѓС‡Р°РµРј РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РѕРєРЅР° Р»Р°СѓРЅС‡РµСЂР°
     On Error Resume Next
-    launcherHwnd = shell.AppActivate("Лаунчер Minecraft") ' Укажи название окна лаунчера
+    launcherHwnd = shell.AppActivate("Minecraft Launcher") ' РЈРєР°Р¶Рё РЅР°Р·РІР°РЅРёРµ РѕРєРЅР° Р»Р°СѓРЅС‡РµСЂР°
     On Error GoTo 0
 
-    ' Скрываем лаунчер (если он активен)
+    ' РЎРєСЂС‹РІР°РµРј Р»Р°СѓРЅС‡РµСЂ (РµСЃР»Рё РѕРЅ Р°РєС‚РёРІРµРЅ)
     If launcherHwnd Then
-        shell.SendKeys "% n" ' Отправляем Alt+Tab для сворачивания
+        shell.SendKeys "% n" ' РћС‚РїСЂР°РІР»СЏРµРј Alt+Tab РґР»СЏ СЃРІРѕСЂР°С‡РёРІР°РЅРёСЏ
     End If
 
-    ' Запускаем Minecraft в скрытом режиме
+    ' Р—Р°РїСѓСЃРєР°РµРј Minecraft РІ СЃРєСЂС‹С‚РѕРј СЂРµР¶РёРјРµ
     On Error Resume Next
-    exitCode = shell.Run(commandLine, 0, False) ' Флаг 0 скрывает консольное окно
+    exitCode = shell.Run(commandLine, 0, False) ' Р¤Р»Р°Рі 0 СЃРєСЂС‹РІР°РµС‚ РєРѕРЅСЃРѕР»СЊРЅРѕРµ РѕРєРЅРѕ
     If Err.Number <> 0 Then
-        MsgBox "Ошибка при запуске игры. Подробнее в логах - latest_log.txt" & Err.Description, vbCritical, "Ошибка"
-        LogEvent "[ERROR] Ошибка при запуске игры. Подробно: Отсутствует Java 8!" & Err.Description
+        MsgBox "Error when starting the game. More details in the logs - latest_log.txt" & Err.Description, vbCritical, "Error"
+        LogEvent "[ERROR/CLIENT]: Error starting the game. Details: Java 8 is missing!" & Err.Description
     Else
-        LogEvent "[CLIENT] Игра запущена успешно"
+        LogEvent "[INFO/CLIENT]: The game has been launched successfully."
     End If
     On Error GoTo 0
 End Sub
 
-' Основное меню
+' РћСЃРЅРѕРІРЅРѕРµ РјРµРЅСЋ
 Sub MainMenu
     Dim choice
     InitializeLog
     LoadSettings
     Do
-        choice = InputBox(FormatText("Меню лаунчера", _
-                                     "1. Запуск игры" & vbCrLf & _
-                                     "2. Настройки" & vbCrLf & _
-                                     "3. Выход"))
+        choice = InputBox(FormatText("Menu", _
+                                     "1. Launch" & vbCrLf & _
+                                     "2. Settings" & vbCrLf & _
+                                     "3. Exit"))
         If choice = "" Then Exit Do
         Select Case choice
             Case "1"
@@ -276,10 +276,10 @@ Sub MainMenu
             Case "3"
                 If ConfirmExit Then Exit Do
             Case Else
-                MsgBox "Неверный выбор!", vbExclamation, "Ошибка"
+                MsgBox "Wrong choice!", vbExclamation, "Error"
         End Select
     Loop
 End Sub
 
-' Запуск основной программы
+' Р—Р°РїСѓСЃРє РѕСЃРЅРѕРІРЅРѕР№ РїСЂРѕРіСЂР°РјРјС‹
 MainMenu
